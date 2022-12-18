@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>
+    <meta charset="utf-8">
+    <title></title>
+</head>
+
+<body>
+    <main class="form">
+        <div class="head">
+            <h1>
+                <center>🎄 ❄️ Обратная польская запись 🎁 🌟
+            </h1>
+        </div>
+
+        <div class="content">
+
+            <label
+                class="form-label label_1"
+                for="mathematical-expression">
+                Исходное выражение
+            </label>
+
+            <input
+                type="text"
+                class="form-control math_express fill-width"
+                name="mathematical-expression"
+                id="math_express"
+                value="2*(x+y^2) >= 100 - 5"
+                title="Подсказка">
+
+            <button
+                type="button"
+                class="btn start_in_auto"
+                name="start-in-auto"
+                id="start_in_auto"
+                onclick="StartAnalysis()">
+                Запустить
+            </button>
+
+            <div class="label_3"></div> <!-- для вывода ошибок -->
+
+            <table class="result_table">
+                <thead>
+                    <tr>
+                        <td>Символ</td>
+                        <td>Операция</td>
+                        <td>Стек</td>
+                        <td>Выходная строка</td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                </tbody>
+            </table>
+
+        </div>
+    </main>
+    <script>
+        Onload();
+    </script>
+</body>
+
+</html>

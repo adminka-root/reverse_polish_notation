@@ -1,2 +1,4 @@
 # reverse_polish_notation
-translation into reverse Polish notation
+Реализация перевода инфиксного выражения в обратную польскую запись.
+
+![](https://i.imgur.com/He3Amn5.png)

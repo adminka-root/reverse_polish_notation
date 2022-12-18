@@ -1,0 +1,122 @@
+body::before {
+    content: "" ;
+    z-index: -1 ;
+    position: fixed ;
+    top: 0 ;
+    left: 0 ;
+    background: #ad99ff no-repeat url("./img/Geese_in_the_pond.jpg") center ;
+    background-size: cover ;
+    width: 100vw ;
+    height: 100vh ;
+}
+
+.head {
+    color: black;
+    -webkit-text-stroke: 1px rgb(255, 255, 255, 0.5);
+    text-stroke: 1px rgb(255, 255, 255, 0.5);
+}
+
+.form {
+    min-width: 550px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.content {
+    padding: 20px;
+    background-color: #EEDDFF;
+    border: 6px solid #7922CC;
+    border-radius: 25px;
+
+    display: grid;
+
+
+    /* 3 строки  ширина */
+    grid-template-rows: [start] 40px [row2] 40px [end] auto;
+
+    /* 3 столбца  длина */
+    grid-template-columns: minmax(190px, 180px) minmax(100px, auto) minmax(100px, 150px);
+
+    align-items: center;
+
+    grid-template-areas: "label_1 math_express start_in_auto"
+        "label_3 label_3 label_3"
+        "result_table result_table result_table";
+
+    grid-column-gap: 5px;
+    grid-row-gap: 5px;
+    text-align: center;
+}
+
+.label_1 {  /* Исходное выражение */
+    grid-area: label_1;
+}
+
+.math_express {
+    grid-area: math_express;
+}
+
+.start_in_auto {
+    grid-area: start_in_auto;
+}
+
+.label_3 {  /* Для ошибок */
+    grid-area: label_3;
+    text-align: center;
+    border-bottom: 5px solid rgb(48, 149, 207);
+    margin: 0px;
+}
+
+textarea, input, select, button {
+  /* width: 100%; /* extend the width of the grid item */
+  height: 100%;
+  box-sizing: border-box; /* including padding / border in width */
+}
+
+textarea {
+    resize: none;
+}
+
+.result_table {
+    grid-area: result_table;
+}
+
+
+th {
+    font-weight: normal;
+    font-size: 26px;
+    color: #000;
+}
+
+td {
+    color: #000;
+    border-top: 1px solid white;
+    padding: 10px 12px;
+    background: rgba(0, 108, 177, 0.3);
+    transition: .3s;
+}
+
+tr:hover td {
+    background: rgba(0, 108, 177, 0.4);
+}
+
+table td:nth-of-type(1) {
+	width: 5%;
+}
+table td:nth-of-type(2) {
+	width: 50%;
+}
+
+table td:nth-of-type(3) {
+	width: 22%;
+}
+
+table td:nth-of-type(4) {
+	width: 23%;
+}
+
+
+
+
+
