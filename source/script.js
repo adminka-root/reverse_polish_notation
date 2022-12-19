@@ -5,23 +5,24 @@ cl = function() { // console.log() = cl()
 function Onload() {
     // глобальные переменные
     operators = {
-        '(':  0,
-        ')':  1,
-        'V':  2,
-        '&':  3,
-        '¬':  4,
-        '>':  5,
-        '<':  5,
-        '===': 5,
-        '==': 5,
-        '=': 5,
-        '>=': 5,
-        '<=': 5,
-        '+':  6,
-        '-':  6,
-        '*':  7,
-        '/':  7,
-        '^':  8
+        '(':   0,
+        ')':   1,
+        'V':   2,
+        '&':   3,
+        '¬':   4,
+        '>':   5,
+        '<':   5,
+        '!==': 5,
+        '!=':  5,
+        '==':  5,
+        '=':   5,
+        '>=':  5,
+        '<=':  5,
+        '+':   6,
+        '-':   6,
+        '*':   7,
+        '/':   7,
+        '^':   8
     };
 
 }
@@ -31,18 +32,6 @@ function parsing_the_input_str_into_constituent_elements(input_line, input_opera
     let remember_symbols = ''
     detected_operators = {};
 
-    /*
-        Создает detected_operators вида
-        {
-            'индекс_1': {  // от
-                'operator': обнаж. оператор,
-                'to': индекс_2  // до включая
-            }
-            ...
-        }
-        Т.о. мы фиксируем, начиная от максимально длинных операторов,
-        соответствующие совпадения
-    */
     for (let loop_sm = max_operator_length; loop_sm > 0; loop_sm--) {
         for (let y = 0; y <= input_line.length - loop_sm; y++) {
             if (typeof(detected_operators[y]) === "undefined") {
@@ -75,11 +64,6 @@ function parsing_the_input_str_into_constituent_elements(input_line, input_opera
     }
     if (operand !== '') { input_expression_queue.push(operand) }
 
-    // В целом, можно было бы изначально сравнивать посимвольно, мол
-    // если это не число и не символ, то это оператор
-    // но тогда концептуально мы не смогли бы добавить
-    // в список приоритетов выражения типа 'not' 'and' и т.п.
-    // а сейчас - можем :)
     cl(detected_operators)
     return input_expression_queue.reverse()
 }
@@ -119,74 +103,84 @@ function StartAnalysis() {
       );  // словарь в обратном порядке
     cl(input_expression.slice().reverse())
 
-    let result_expression = '';
-    let stack = [];
-    let top_symbol = ''  // для stack.pop()
 
-    while (true) {
-        const symbol = input_expression.pop();  // считываем символ
-        if (typeof(symbol) === "undefined") {
-            break
-        }
+    if (input_expression.length > 0) {
+        oper_message = {
+            'to_out':   'добавить к выходной строке',
+            'to_stack': 'поместить в стек',
+            'if_)':     '1) присоединить содержимое стека до скобки в \
+                            обратном порядке к выходной строке; \
+                         2) удалить скобку из стека.',
+            'if_gt':    '1) присоединить стек в обратном порядке \
+                            к выходной строке; \
+                         2) поместить новую операцию в стек.',
+            'end_read': 'Присоедить стек в обратном порядке к выходной строке'
+        };
 
-        // если symbol ∈ к {operators}
-        if (typeof(operators[symbol]) !== "undefined") {
-            if (stack.length === 0 || symbol === '(') {
-                stack.push(symbol);
-                result_table.add_Tbody_Line(
-                    symbol,
-                    result_table.oper_message['to_stack'],
-                    stack,
-                    result_expression
-                );
-            }
-            else if (symbol === ')') {
-                top_symbol = stack.pop();
-                while ( (stack.length > 0) && (top_symbol !== '(') ) {
-                    result_expression += top_symbol + ' ';
-                    top_symbol = stack.pop();
+        let result_expression = '';
+        let stack = [];
+        let top_symbol = ''  // для stack.pop()
+
+        while (input_expression.length > 0) {
+            const symbol = input_expression.pop();  // считываем символ
+
+            // если symbol ∈ к {operators}
+            if (typeof(operators[symbol]) !== "undefined") {
+                if (stack.length === 0 || symbol === '(') {
+                    stack.push(symbol);
+                    result_table.add_Tbody_Line(
+                        symbol,
+                        oper_message['to_stack'],
+                        stack,
+                        result_expression
+                    );
                 }
-                result_table.add_Tbody_Line(
-                    symbol,
-                    result_table.oper_message['if_)'],
-                    stack,
-                    result_expression
-                );
-            }
-            else {
-                let message = result_table.oper_message['if_gt']
-                while (stack.length > 0) {
+                else if (symbol === ')') {
                     top_symbol = stack.pop();
-                    if (operators[top_symbol] >= operators[symbol]) {
+                    while ( (stack.length > 0) && (top_symbol !== '(') ) {
                         result_expression += top_symbol + ' ';
+                        top_symbol = stack.pop();
                     }
-                    else {
-                        stack.push(top_symbol);
-                        message = result_table.oper_message['to_stack']
-                        break
-                    }
+                    result_table.add_Tbody_Line(
+                        symbol,
+                        oper_message['if_)'],
+                        stack,
+                        result_expression
+                    );
                 }
-                stack.push(symbol);
+                else {
+                    let message = oper_message['if_gt']
+                    while (stack.length > 0) {
+                        top_symbol = stack.pop();
+                        if (operators[top_symbol] >= operators[symbol]) {
+                            result_expression += top_symbol + ' ';
+                        }
+                        else {
+                            stack.push(top_symbol);
+                            message = oper_message['to_stack']
+                            break
+                        }
+                    }
+                    stack.push(symbol);
+                    result_table.add_Tbody_Line(
+                        symbol,
+                        message,
+                        stack,
+                        result_expression
+                    );
+                }
+            }
+            else {   // если symbol не ∈ к {operators}
+                result_expression += symbol + ' '
                 result_table.add_Tbody_Line(
                     symbol,
-                    message,
+                    oper_message['to_out'],
                     stack,
                     result_expression
                 );
             }
         }
-        else {   // если symbol не ∈ к {operators}
-            result_expression += symbol + ' '
-            result_table.add_Tbody_Line(
-                symbol,
-                result_table.oper_message['to_out'],
-                stack,
-                result_expression
-            );
-        }
-    }
 
-    if (0 < result_expression.length) {
         let sm = '';
         while (sm = stack.pop()) {
             result_expression += sm + ' ';
@@ -194,14 +188,16 @@ function StartAnalysis() {
 
         result_table.add_Tbody_Line(
             '',
-            result_table.oper_message['end_read'],
+            oper_message['end_read'],
             '',
             result_expression
         );
+
+        cl(result_expression);
+        return result_expression;
     }
 
-    cl(result_expression);
-    return result_expression;
+    return false
 }
 
 
@@ -210,18 +206,6 @@ function StartAnalysis() {
           this.table = table;
           this.table_tbody = this.table.getElementsByTagName('tbody')[0];
           this.delete_All_Tbody_Lines();
-
-          this.oper_message = {
-              'to_out':   'добавить к выходной строке',
-              'to_stack': 'поместить в стек',
-              'if_)':     '1) присоединить содержимое стека до скобки в \
-                              обратном порядке к выходной строке; \
-                           2) удалить скобку из стека.',
-              'if_gt':    '1) присоединить стек в обратном порядке \
-                              к выходной строке; \
-                           2) поместить новую операцию в стек.',
-              'end_read': 'Присоедить стек в обратном порядке к выходной строке'
-          };
       }
 
       delete_All_Tbody_Lines() {
